@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key>
+  <string>$(PRODUCT_NAME)</string>
+  <key>CFBundleIdentifier</key>
+  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleVersion</key>
+  <string>1</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0</string>
+  <!-- Add these permissions -->
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>We need your location to show pins on the map</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>We need microphone access for voice messages</string>
+  <key>NSCameraUsageDescription</key>
+  <string>We need camera access for video messages</string>
+  <!-- Firebase (if you plan to add it later) -->
+  <key>FirebaseAppDelegateProxyEnabled</key>
+  <false/>
+</dict>
+</plist>
