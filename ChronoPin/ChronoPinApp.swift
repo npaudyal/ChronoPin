@@ -6,17 +6,17 @@
 //
 
 import SwiftUI
+import FirebaseCore
 @main
 struct ChronoPinApp: App {
     let persistenceController = PersistenceController.shared
     init(){
-        FirebaseManager.shared
+        FirebaseApp.configure()
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            SplashScreenView()
         }
     }
 }

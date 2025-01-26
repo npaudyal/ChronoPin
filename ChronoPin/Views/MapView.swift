@@ -8,37 +8,30 @@
 import SwiftUI
 import MapKit
 
-import SwiftUI
-import MapKit
-
 struct MapView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var cameraPosition: MapCameraPosition = .automatic
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     @State private var showMessagePopup = false
+    @State private var showTextInput = false
 
     var body: some View {
         ZStack {
-            // New iOS 17 Map Syntax
+            // Map View
             Map(position: $cameraPosition) {
-                // Show user's current location (blue dot)
-                UserAnnotation()
+                UserAnnotation() // Show user's current location
             }
             .mapControls {
-                // Optional: Add compass, scale, etc.
                 MapCompass()
                 MapScaleView()
             }
-            .gesture(
-                LongPressGesture(minimumDuration: 0.5)
-                    .onEnded { _ in
-                        selectedCoordinate = locationManager.userLocation?.coordinate
-                        showMessagePopup = true
-                    }
-            )
+            .onLongPressGesture {
+                // Use the map's center as the selected coordinate
+                selectedCoordinate = locationManager.userLocation?.coordinate ?? cameraPosition.region?.center
+                showMessagePopup = true
+            }
             .onAppear {
                 locationManager.startUpdatingLocation()
-                // Center map on user location
                 if let location = locationManager.userLocation?.coordinate {
                     cameraPosition = .region(MKCoordinateRegion(
                         center: location,
@@ -46,10 +39,26 @@ struct MapView: View {
                     ))
                 }
             }
+
+            // Popup for Message Type Selection
+            if showMessagePopup {
+                MessageTypePopup(
+                    selectedCoordinate: $selectedCoordinate,
+                    showMessagePopup: $showMessagePopup,
+                    showTextInput: $showTextInput
+                )
+                .transition(.scale) // Optional animation
+            }
+        }
+        .sheet(isPresented: $showTextInput) {
+            if let coordinate = selectedCoordinate {
+                TextInputView(coordinate: coordinate)
+            }
         }
     }
 }
 
+// Preview
 #Preview {
     MapView()
 }
