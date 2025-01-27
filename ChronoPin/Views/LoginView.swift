@@ -15,6 +15,8 @@ struct LoginView: View {
     @State private var password = ""
     @State private var errorMessage = ""
     @State private var isAuthenticated = false
+    @EnvironmentObject var authViewModel: AuthViewModel
+
 
     var body: some View {
         VStack(spacing: 20) {

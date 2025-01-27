@@ -20,6 +20,9 @@ struct MapView: View {
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     @State private var showMessagePopup = false
     @State private var showTextInput = false
+    @State private var selectedPin: ChronoPin?
+    @State private var showPinDetail = false
+    @State private var showDistanceAlert = false
     @State private var pins: [ChronoPin] = []
 
     var body: some View {
@@ -34,6 +37,10 @@ struct MapView: View {
                         )) {
                             Image(systemName: "mappin")
                                 .foregroundStyle(.red)
+                                .onTapGesture {
+                                    selectedPin = pin
+                                    validatePinProximity()
+                            }
                         }
                     }
                 }
@@ -88,6 +95,16 @@ struct MapView: View {
                 TextInputView(coordinate: coordinate)
             }
         }
+        .sheet(isPresented: $showPinDetail) {
+            if let pin = selectedPin {
+                PinDetailView(pin: pin)
+            }
+        }
+        .alert("Too Far Away", isPresented: $showDistanceAlert) {
+            Button("OK") { }
+        } message: {
+            Text("You must be within 50 meters to view this pin.")
+        }
     }
 
     private func fetchPins() {
@@ -97,6 +114,33 @@ struct MapView: View {
             .addSnapshotListener { snapshot, error in
                 pins = snapshot?.documents.compactMap { ChronoPin(document: $0) } ?? []
             }
+    }
+    
+    private func isNearby(pinLocation: GeoPoint, userLocation: CLLocation?) -> Bool {
+        guard let userLocation = userLocation else { return false }
+        
+        let pinCoordinate = CLLocationCoordinate2D(
+            latitude: pinLocation.latitude,
+            longitude: pinLocation.longitude
+        )
+        let pinCLLocation = CLLocation(latitude: pinCoordinate.latitude, longitude: pinCoordinate.longitude)
+        
+        // Check if within 50 meters (adjust threshold as needed)
+        return userLocation.distance(from: pinCLLocation) <= 50
+    }
+    
+    private func validatePinProximity() {
+        guard let pin = selectedPin,
+              let userLocation = locationManager.userLocation else {
+            showDistanceAlert = true
+            return
+        }
+        
+        if isNearby(pinLocation: pin.location, userLocation: userLocation) {
+            showPinDetail = true
+        } else {
+            showDistanceAlert = true
+        }
     }
 }
 
