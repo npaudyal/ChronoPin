@@ -7,6 +7,12 @@
 
 import SwiftUI
 import MapKit
+import FirebaseFirestore
+import FirebaseAuth
+
+import SwiftUI
+import MapKit
+import FirebaseAuth
 
 struct MapView: View {
     @StateObject private var locationManager = LocationManager()
@@ -14,40 +20,67 @@ struct MapView: View {
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     @State private var showMessagePopup = false
     @State private var showTextInput = false
+    @State private var pins: [ChronoPin] = []
 
     var body: some View {
         ZStack {
-            // Map View
-            Map(position: $cameraPosition) {
-                UserAnnotation() // Show user's current location
-            }
-            .mapControls {
-                MapCompass()
-                MapScaleView()
-            }
-            .onLongPressGesture {
-                // Use the map's center as the selected coordinate
-                selectedCoordinate = locationManager.userLocation?.coordinate ?? cameraPosition.region?.center
-                showMessagePopup = true
-            }
-            .onAppear {
-                locationManager.startUpdatingLocation()
-                if let location = locationManager.userLocation?.coordinate {
-                    cameraPosition = .region(MKCoordinateRegion(
-                        center: location,
-                        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                    ))
+            MapReader { proxy in
+                Map(position: $cameraPosition) {
+                    UserAnnotation() // Shows the user's live location dot
+                    ForEach(pins, id: \.id) { pin in
+                        Annotation("", coordinate: CLLocationCoordinate2D(
+                            latitude: pin.location.latitude,
+                            longitude: pin.location.longitude
+                        )) {
+                            Image(systemName: "mappin")
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
+                .mapControls {
+                    MapCompass()
+                    MapScaleView()
+                }
+                .simultaneousGesture(
+                    LongPressGesture(minimumDuration: 0.5)
+                        .sequenced(before: DragGesture(minimumDistance: 0))
+                        .onEnded { value in
+                            switch value {
+                            case .second(_, let drag):
+                                if let location = drag?.location {
+                                    selectedCoordinate = proxy.convert(location, from: .local)
+                                    showMessagePopup = true
+                                }
+                            default:
+                                break
+                            }
+                        }
+                )
+                .onAppear {
+                    locationManager.startUpdatingLocation()
+                    fetchPins()
+
+                    // Set initial map position to user's location (if available)
+                    if let userLocation = locationManager.userLocation?.coordinate {
+                        let span = MKCoordinateSpan(
+                            latitudeDelta: 0.1, // Adjust zoom level (smaller = zoomed in)
+                            longitudeDelta: 0.1
+                        )
+                        cameraPosition = .region(MKCoordinateRegion(
+                            center: userLocation,
+                            span: span
+                        ))
+                    }
                 }
             }
 
-            // Popup for Message Type Selection
             if showMessagePopup {
                 MessageTypePopup(
                     selectedCoordinate: $selectedCoordinate,
                     showMessagePopup: $showMessagePopup,
                     showTextInput: $showTextInput
                 )
-                .transition(.scale) // Optional animation
+                .transition(.scale)
             }
         }
         .sheet(isPresented: $showTextInput) {
@@ -55,6 +88,15 @@ struct MapView: View {
                 TextInputView(coordinate: coordinate)
             }
         }
+    }
+
+    private func fetchPins() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        Firestore.firestore().collection("pins")
+            .whereField("userId", isEqualTo: userId)
+            .addSnapshotListener { snapshot, error in
+                pins = snapshot?.documents.compactMap { ChronoPin(document: $0) } ?? []
+            }
     }
 }
 
