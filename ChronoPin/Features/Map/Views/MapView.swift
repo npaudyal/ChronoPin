@@ -20,6 +20,7 @@ struct MapView: View {
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     @State private var showMessagePopup = false
     @State private var showTextInput = false
+    @State private var showVideoRecording = false
     @State private var selectedPin: ChronoPin?
     @State private var showPinDetail = false
     @State private var showDistanceAlert = false
@@ -85,7 +86,9 @@ struct MapView: View {
                 MessageTypePopup(
                     selectedCoordinate: $selectedCoordinate,
                     showMessagePopup: $showMessagePopup,
-                    showTextInput: $showTextInput
+                    showTextInput: $showTextInput,
+                    showVideoRecording: $showVideoRecording
+
                 )
                 .transition(.scale)
             }
@@ -93,6 +96,11 @@ struct MapView: View {
         .sheet(isPresented: $showTextInput) {
             if let coordinate = selectedCoordinate {
                 TextInputView(coordinate: coordinate)
+            }
+        }
+        .sheet(isPresented: $showVideoRecording) {
+            if let coordinate = selectedCoordinate {
+                VideoRecordingView(coordinate: coordinate)
             }
         }
         .sheet(isPresented: $showPinDetail) {

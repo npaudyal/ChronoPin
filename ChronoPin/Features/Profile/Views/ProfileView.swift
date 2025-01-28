@@ -16,7 +16,7 @@ struct ProfileView: View {
             VStack {
                 if let user = authViewModel.user {
                     VStack(spacing: 20) {
-                        Text(user.email ?? "Unknown email")
+                        Text(user.email.isEmpty ? "Unknown email" : user.email)
                             .font(.title2)
                         
                         Button("Log Out") {

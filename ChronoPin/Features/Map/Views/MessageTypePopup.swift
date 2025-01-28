@@ -11,6 +11,7 @@ struct MessageTypePopup: View {
     @Binding var selectedCoordinate: CLLocationCoordinate2D?
     @Binding var showMessagePopup: Bool
     @Binding var showTextInput: Bool
+    @Binding var showVideoRecording: Bool
 
     var body: some View {
         VStack(spacing: 20) {
@@ -46,14 +47,18 @@ struct MessageTypePopup: View {
                 .disabled(true) // Not implemented yet
 
                 // Video Message (Placeholder)
-                Button(action: {}) {
+                Button(action: {
+                    print("Video button tapped")
+                    showVideoRecording = true
+                    showMessagePopup = false
+                }) {
                     VStack {
                         Image(systemName: "video.circle.fill")
                             .font(.largeTitle)
                         Text("Video")
                     }
                 }
-                .disabled(true) // Not implemented yet
+                .disabled(false)
             }
         }
         .padding()

@@ -37,7 +37,7 @@ class UserService {
     func sendFriendRequest(from senderID: String, to receiverID: String) async throws {
         let receiverRef = db.collection("users").document(receiverID)
         try await receiverRef.updateData([
-            "friendRequests": FieldValue.arrayUnion([senderID])
+            "friend_requests": FieldValue.arrayUnion([senderID])
         ])
     }
     
@@ -49,7 +49,7 @@ class UserService {
         
         batch.updateData([
             "friends": FieldValue.arrayUnion([friendID]),
-            "friendRequests": FieldValue.arrayRemove([friendID])
+            "friend_requests": FieldValue.arrayRemove([friendID])
         ], forDocument: userRef)
         
         batch.updateData([

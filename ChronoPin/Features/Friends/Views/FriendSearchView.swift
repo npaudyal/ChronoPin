@@ -30,10 +30,10 @@ struct FriendSearchView: View {
                 }
             }
             .searchable(text: $searchText)
-            .onChange(of: searchText) { newValue in
+            .onChange(of: searchText) {
                 Task {
                     do {
-                        let results = try await UserService().searchUsers(username: newValue)
+                        let results = try await UserService().searchUsers(username: searchText)
                         searchResults = results.filter { $0.id != authViewModel.user?.id }
                     } catch {
                         print("Search error: \(error)")

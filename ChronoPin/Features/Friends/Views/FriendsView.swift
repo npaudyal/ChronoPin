@@ -58,6 +58,7 @@ struct FriendsView: View {
             
             // Get friends
             friends = await fetchUsers(ids: user.friends, service: service)
+            print("Friend requests array:", user)
             
             // Get pending requests
             pendingRequests = await fetchUsers(ids: user.friendRequests, service: service)
