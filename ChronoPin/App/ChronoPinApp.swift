@@ -21,15 +21,9 @@ struct ChronoPinApp: App {
 
     var body: some Scene {
             WindowGroup {
-                Group {
-                    if authViewModel.user != nil {
-                        MainTabView()
-                            .environmentObject(authViewModel)
-                    } else {
-                        LoginView() // Make sure you have a LoginView
-                            .environmentObject(authViewModel)
-                    }
-                }
+                ContentView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                    .environmentObject(authViewModel)
             }
         }
 }
