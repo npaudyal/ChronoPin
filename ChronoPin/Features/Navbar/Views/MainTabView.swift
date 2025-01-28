@@ -51,13 +51,19 @@ struct MainTabView: View {
 }
 
 #Preview {
+    // Create mock auth state
     let authViewModel = AuthViewModel()
-    authViewModel.user = AppUser( // Updated type name
+    
+    // Configure mock user
+    authViewModel.user = AppUser(
         id: "preview-user-123",
         email: "preview@chronopin.com",
-        displayName: "Preview User"
+        username: "PreviewUser",
+        friends: [],
+        friendRequests: []
     )
     
-    return MainTabView()
+    // Return the view (implicit return)
+   return MainTabView()
         .environmentObject(authViewModel)
 }

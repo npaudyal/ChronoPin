@@ -43,13 +43,5 @@ struct ProfileView: View {
 }
 
 #Preview {
-    let authViewModel = AuthViewModel()
-    authViewModel.user = AppUser( // Updated type name
-        id: "preview-user-123",
-        email: "preview@chronopin.com",
-        displayName: "Preview User"
-    )
-    
-    return ProfileView()
-        .environmentObject(authViewModel)
+    ProfileView()
 }
