@@ -15,7 +15,7 @@ struct ContentView: View {
         Group {
             if authViewModel.user != nil {
                 // User is logged in
-                MainTabView().environmentObject(authViewModel)
+                GetStartedView()
             } else {
                 // User is not logged in
                 LoginView().environmentObject(authViewModel)
